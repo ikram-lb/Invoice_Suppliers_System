@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2 class="text-3xl font-bold mb-6 text-gray-800">Facture Details</h2>
+
+<div class="bg-gray-50 p-6 rounded-lg shadow-lg">
+    <p><strong>Numero:</strong> {{ facture.numero }}</p>
+    <p><strong>Date:</strong> {{ facture.date }}</p>
+    <p><strong>Amount:</strong> {{ facture.montant }}</p>
+    <p><strong>Fournisseur:</strong> {{ facture.fournisseur.nom_societe }}</p>
+    <p><strong>State:</strong> {{ facture.get_state_display }}</p>
+    <p><strong>File:</strong> {% if facture.fichier %}<a href="{{ facture.fichier.url }}" class="text-green-500 hover:text-green-700" download>Download File</a>{% else %}No file uploaded{% endif %}</p>
+    <a href="{% url 'facture_list' %}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Back to List</a>
+</div>
+
+{% endblock %}

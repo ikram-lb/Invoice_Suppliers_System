@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<h2 class="text-4xl font-extrabold mb-8 text-gray-900">
+    {% if object.pk %}Update{% else %}Create{% endif %} Facture
+</h2>
+
+<form method="post" enctype="multipart/form-data" id="facture-form" class="bg-white p-8 rounded-lg shadow-lg">
+    {% csrf_token %}
+    
+    <!-- Fournisseur Field -->
+    <div class="mb-6">
+        <label for="fournisseur" class="block text-gray-700 font-semibold mb-2">Fournisseur:</label>
+        {{ form.fournisseur|add_class:"form-input w-full border-gray-300 h-9 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" }}
+    </div>
+
+    <!-- Facture Number Field -->
+    <div class="mb-6">
+        <label for="facture-number" class="block text-gray-700 font-semibold mb-2">Facture Number:</label>
+        {{ form.numero|add_class:"form-input w-full border-gray-300 h-9  rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" }}
+    </div>
+
+    <!-- Date Field -->
+    <div class="mb-6">
+        <label for="facture-date" class="block text-gray-700 font-semibold mb-2">Date:</label>
+        {{ form.date|add_class:"form-input w-full border-gray-300 h-9  rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" }}
+    </div>
+
+    <!-- Amount Field -->
+    <div class="mb-6">
+        <label for="facture-amount" class="block text-gray-700 font-semibold mb-2">Amount:</label>
+        {{ form.montant|add_class:"form-input w-full border-gray-300 h-9  rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" }}
+    </div>
+
+    <!-- File Upload Field -->
+    <div class="mb-6">
+        <label for="facture-file" class="block text-gray-700 font-semibold mb-2">Upload File:</label>
+        {{ form.fichier|add_class:"form-input w-full border-gray-300 h-9  rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" }}
+    </div>
+
+    <!-- State Field -->
+    <div class="mb-6">
+        <label for="facture-state" class="block text-gray-700 font-semibold mb-2">State:</label>
+        {{ form.state|add_class:"form-select w-full border-gray-300 h-9  rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" }}
+    </div>
+
+    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        {% if object.pk %}Update{% else %}Create{% endif %}
+    </button>
+</form>
+
+<script src="{% static 'js/validate_facture.js' %}"></script>
+{% endblock %}

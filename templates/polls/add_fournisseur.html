@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="min-h-screen p-6 bg-white-400 text-black flex items-center justify-center">
+  <div class="container max-w-screen-lg mx-auto">
+    <div>
+      <h2 class="font-semibold text-xl">Add Supplier</h2>
+      <p class="mb-6">Please fill out all the fields.</p>
+
+      <div class="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
+        <form action="{% url 'add_fournisseur' %}" method="post">
+          {% csrf_token %}
+          {% include 'partials/_messages.html' %}
+          <div class="grid gap-4 gap-y-2 text-sm grid-cols-1 lg:grid-cols-3">
+            <div>
+              <p class="font-medium text-lg">Supplier Details</p>
+              <p>Please fill out all the fields.</p>
+            </div>
+
+            <div class="lg:col-span-2">
+              <div class="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-2">
+                <div class="md:col-span-2">
+                  <label for="nom_societe" class="block text-sm font-medium text-gray-700">Company Name</label>
+                  <input type="text" name="nom_societe" id="nom_societe" 
+                         class="mt-1 h-10 border border-gray-300 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300" 
+                         value="{{ fournisseur_form.nom_societe.value|default_if_none:'' }}" />
+                </div>
+
+                <div class="md:col-span-2">
+                  <label for="nom_personne" class="block text-sm font-medium text-gray-700">Contact Person</label>
+                  <input type="text" name="nom_personne" id="nom_personne" 
+                         class="mt-1 h-10 border border-gray-300 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300" 
+                         value="{{ fournisseur_form.nom_personne.value|default_if_none:'' }}" />
+                </div>
+
+                <div class="md:col-span-2">
+                  <label for="adresse_facturation" class="block text-sm font-medium text-gray-700">Billing Address</label>
+                  <input type="text" name="adresse_facturation" id="adresse_facturation" 
+                         class="mt-1 h-10 border border-gray-300 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300" 
+                         value="{{ fournisseur_form.adresse_facturation.value|default_if_none:'' }}" />
+                </div>
+
+                <div class="md:col-span-1">
+                  <label for="ville" class="block text-sm font-medium text-gray-700">City</label>
+                  <select name="ville" id="ville" class="h-10 border mt-1 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300">
+                    <option value="">Select City</option>
+                    <!-- Cities will be populated based on country selection -->
+                  </select>
+                </div>
+
+                <div class="md:col-span-1">
+                  <label for="pays_region" class="block text-sm font-medium text-gray-700">Country/Region</label>
+                  <select name="pays_region" id="pays_region" class="h-10 border mt-1 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300">
+                    <option value="">Select Country/Region</option>
+                    <option value="USA">USA</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Morocco">Morocco</option>
+                    <option value="Spain">Spain</option>
+                    <option value="France">France</option>
+                    <option value="Tunisia">Tunisia</option>
+                    <option value="Algeria">Algeria</option>
+                    <option value="Egypt">Egypt</option>
+                    <!-- Add more countries as needed -->
+                  </select>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label for="numeros_telephone" class="block text-sm font-medium text-gray-700">Phone Numbers</label>
+                  <textarea name="numeros_telephone" id="numeros_telephone" class="h-20 border mt-1 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300">{{ fournisseur_form.numeros_telephone.value|default_if_none:'' }}</textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label for="emails" class="block text-sm font-medium text-gray-700">Emails</label>
+                  <textarea name="emails" id="emails" class="h-20 border mt-1 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300">{{ fournisseur_form.emails.value|default_if_none:'' }}</textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                  <textarea name="notes" id="notes" class="h-20 border mt-1 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300">{{ fournisseur_form.notes.value|default_if_none:'' }}</textarea>
+                </div>
+
+                <div class="md:col-span-2 flex justify-end">
+                  <button type="submit" class="bg-purple-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const countryCityMap = {
+    USA: ["New York", "Los Angeles", "Chicago"],
+    Canada: ["Toronto", "Vancouver", "Montreal"],
+    Morocco: ["Casablanca", "Rabat", "Marrakech"],
+    Spain: ["Madrid", "Barcelona", "Valencia"],
+    France: ["Paris", "Lyon", "Marseille"],
+    Tunisia: ["Tunis", "Sfax", "Sousse"],
+    Algeria: ["Algiers", "Oran", "Constantine"],
+    Egypt: ["Cairo", "Alexandria", "Giza"],
+    // Add more countries and their cities as needed
+  };
+
+  document.getElementById('pays_region').addEventListener('change', function() {
+    const country = this.value;
+    const cities = countryCityMap[country] || [];
+    const citySelect = document.getElementById('ville');
+
+    citySelect.innerHTML = cities.map(city => `<option value="${city}">${city}</option>`).join('');
+  });
+</script>
+{% endblock %}

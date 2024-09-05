@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>SuppliersManagement {% block title %}{% endblock %}</title>
+  
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap core CSS (You can remove this if not needed) -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/input.css' %}" rel="stylesheet">
+  
+  <!-- Custom styles for this template -->
+  <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+</head>
+<body class="bg-gray-100">
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark fixed-top bg-gray-900 shadow-md py-2">
+  <div class="container mx-auto flex justify-between items-center h-12">
+    <!-- Brand Title -->
+    <a class="navbar-brand text-white text-xl font-semibold" href="#">Axians Suppliers</a>
+
+    <!-- Navbar Items -->
+    <ul class="flex items-center space-x-4">
+      {% if user.is_authenticated %}
+        <li class="nav-item text-white flex items-center text-sm">
+          <i class="fas fa-user text-white mr-2"></i>
+          <span class="nav-link">{{ request.user.username }}</span>
+        </li>
+        <li class="nav-item">
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+              Logout
+            </button>
+          </form>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'register_superuser' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Register
+          </a>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a href="{% url 'login' %}" class="text-white text-sm">Login</a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+<!-- Main content -->
+<div class="container-fluid mt-14">
+  <div class="row">
+    <!-- Sidebar -->
+    {% include 'partials/_sidebar.html' %}
+    
+    <!-- Main content area -->
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-6">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<!-- Bootstrap and other scripts -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"  crossorigin="anonymous"></script>
+{% comment %} <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4Ag8P1B8RO3A+Kq8FvH83w27px7fDs2b1TI6G0A0E5p6WlA7T5OrS" crossorigin="anonymous"></script> {% endcomment %}
+</body>
+</html>

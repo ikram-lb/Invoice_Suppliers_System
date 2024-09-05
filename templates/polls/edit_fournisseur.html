@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen p-6 bg-gray-100 flex items-center justify-center">
+  <div class="container max-w-screen-lg mx-auto">
+    <nav aria-label="breadcrumb" class="mb-6">
+      <ol class="breadcrumb flex space-x-2 text-gray-600">
+        <li class="breadcrumb-item">
+          <a href="{% url 'polls' %}" class="text-blue-500 hover:text-blue-700">Suppliers</a>
+        </li>
+        <li class="breadcrumb-item text-gray-500">/</li>
+        <li class="breadcrumb-item active" aria-current="page">Edit Supplier</li>
+      </ol>
+    </nav>
+
+    <div class="bg-white rounded shadow-lg p-6 md:p-8 mb-6">
+      <form action="{% url 'edit_fournisseur' fournisseur.id %}" method="post">
+        {% include 'partials/_messages.html' %}
+        {% csrf_token %}
+        <div class="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-2">
+          <div class="md:col-span-2">
+            <label for="nom" class="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" class="mt-1 h-10 border border-gray-300 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300" id="nom" name="nom" value="{{ fournisseur_form.nom.value|default_if_none:'' }}">
+          </div>
+          <div class="md:col-span-2">
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea class="mt-1 h-20 border border-gray-300 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300" id="description" name="description">{{ fournisseur_form.description.value|default_if_none:'' }}</textarea>
+          </div>
+          
+          <div class="md:col-span-1">
+            <label for="pays" class="block text-sm font-medium text-gray-700">Country</label>
+            <select name="pays" id="pays" class="h-10 border mt-1 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300">
+              <option value="">Select Country</option>
+              <option value="USA" {% if adresse_form.pays.value == 'USA' %}selected{% endif %}>USA</option>
+              <option value="Canada" {% if adresse_form.pays.value == 'Canada' %}selected{% endif %}>Canada</option>
+              <option value="Morocco" {% if adresse_form.pays.value == 'Morocco' %}selected{% endif %}>Morocco</option>
+              <option value="Spain" {% if adresse_form.pays.value == 'Spain' %}selected{% endif %}>Spain</option>
+              <option value="France" {% if adresse_form.pays.value == 'France' %}selected{% endif %}>France</option>
+              <option value="Tunisia" {% if adresse_form.pays.value == 'Tunisia' %}selected{% endif %}>Tunisia</option>
+              <option value="Algeria" {% if adresse_form.pays.value == 'Algeria' %}selected{% endif %}>Algeria</option>
+              <option value="Egypt" {% if adresse_form.pays.value == 'Egypt' %}selected{% endif %}>Egypt</option>
+              <!-- Add more countries as needed -->
+            </select>
+          </div>
+
+          <div class="md:col-span-1">
+            <label for="ville" class="block text-sm font-medium text-gray-700">City</label>
+            <select name="ville" id="ville" class="h-10 border mt-1 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300">
+              <option value="">Select City</option>
+              <!-- Cities will be populated based on country selection -->
+            </select>
+          </div>
+          
+          <div class="md:col-span-1">
+            <label for="email" class="block text-sm font-medium text-gray-700">Contact Email</label>
+            <input type="email" class="mt-1 h-10 border border-gray-300 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300" id="email" name="email" value="{{ contact_form.email.value|default_if_none:'' }}">
+          </div>
+          <div class="md:col-span-1">
+            <label for="telephone" class="block text-sm font-medium text-gray-700">Contact Telephone</label>
+            <input type="text" class="mt-1 h-10 border border-gray-300 rounded-md px-4 w-full bg-gray-50 focus:ring focus:border-blue-300" id="telephone" name="telephone" value="{{ contact_form.telephone.value|default_if_none:'' }}">
+          </div>
+          <div class="md:col-span-2 flex justify-end mt-4">
+            <button type="submit" class="bg-purple-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Update Supplier</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const countryCityMap = {
+    USA: ["New York", "Los Angeles", "Chicago"],
+    Canada: ["Toronto", "Vancouver", "Montreal"],
+    // Add more countries and their cities
+  };
+
+  function populateCities(country) {
+    const cities = countryCityMap[country] || [];
+    const citySelect = document.getElementById('ville');
+
+    citySelect.innerHTML = cities.map(city => `<option value="${city}" {% if adresse_form.ville.value == '${city}' %}selected{% endif %}>${city}</option>`).join('');
+  }
+
+  document.getElementById('pays').addEventListener('change', function() {
+    const country = this.value;
+    populateCities(country);
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const initialCountry = document.getElementById('pays').value;
+    if (initialCountry) {
+      populateCities(initialCountry);
+    }
+  });
+</script>
+{% endblock %}

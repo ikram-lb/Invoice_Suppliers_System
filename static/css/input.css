@@ -1,0 +1,7 @@
+/* static/css/tailwind.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your custom CSS can go here */

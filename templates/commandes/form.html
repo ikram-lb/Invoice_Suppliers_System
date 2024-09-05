@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>{% if commande.pk %}Update{% else %}Create{% endif %} Commande</h2>
+<form method="post" id="commande-form">
+    {% csrf_token %}
+
+    <!-- Basic fields -->
+    <div class="mb-4">
+        <label for="fournisseur" class="block text-gray-700">Fournisseur:</label>
+        <select name="fournisseur" id="fournisseur" class="form-control form-control-sm w-full border border-gray-300 rounded-md">
+            {% for fournisseur in fournisseurs %}
+            <option value="{{ fournisseur.id }}" {% if fournisseur.id == commande.fournisseur.id %}selected{% endif %}>{{ fournisseur.nom_societe }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-4">
+        <label for="numero" class="block text-gray-700">Numero:</label>
+        <input type="text" name="numero" id="numero" class="form-control form-control-sm w-full border border-gray-300 rounded-md" value="{{ commande.numero }}">
+        <div id="numero-error" class="hidden text-red-600 mt-2">This numero is already in use.</div>
+    </div>
+    
+
+    <div class="mb-4">
+        <label for="date" class="block text-gray-700">Date:</label>
+        <input type="date" name="date" id="date" class="form-control form-control-sm w-full border border-gray-300 rounded-md" value="{{ commande.date|date:'Y-m-d' }}">
+    </div>
+
+    <div class="mb-4">
+        <label for="products" class="block text-gray-700">Products:</label>
+        <div id="products-container">
+            {% if commande.pk %}
+                {% for product_row in commande.commandeproduit_set.all %}
+                <div class="product-row flex space-x-4 mb-2">
+                    <div class="flex-1">
+                        <label for="product_{{ forloop.counter }}" class="block text-gray-600">Product</label>
+                        <select name="products[]" id="product_{{ forloop.counter }}" class="product-select form-control form-control-sm w-full border border-gray-300 rounded-md">
+                            {% for produit in produits %}
+                            <option value="{{ produit.id }}" data-price="{{ produit.prix }}" {% if produit.id == product_row.produit.id %}selected{% endif %}>{{ produit.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label for="quantity_{{ forloop.counter }}" class="block text-gray-600">Quantity</label>
+                        <input type="number" name="quantities[]" id="quantity_{{ forloop.counter }}" class="form-control form-control-sm w-full border border-gray-300 rounded-md" min="1" value="{{ product_row.quantite }}">
+                    </div>
+                    <button type="button" class="remove-product bg-red-600 text-white px-4 py-1 rounded-md">Remove</button>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="product-row flex space-x-4 mb-2">
+                <div class="flex-1">
+                    <label for="product_1" class="block text-gray-600">Choose your Products:</label>
+                    <select name="products[]" id="product_1" class="product-select form-control form-control-sm w-full border border-gray-300 rounded-md">
+                        <!-- Options will be added dynamically -->
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label for="quantity_1" class="block text-gray-600">Quantity</label>
+                    <input type="number" name="quantities[]" id="quantity_1" class="form-control form-control-sm w-full border border-gray-300 rounded-md" min="1">
+                </div>
+                <button type="button" class="remove-product bg-red-600 text-white px-4 py-2 rounded-md">Remove</button>
+            </div>
+            {% endif %}
+        </div>
+        <button type="button" id="add-product" class="bg-green-600 text-white px-4 py-2 rounded-md">Add Product</button>
+    </div>
+
+    <div class="mb-4">
+        <label for="total-amount" class="block text-gray-700">Total Amount:</label>
+        <input type="text" id="total-amount" name="montant" class="form-control form-control-sm w-full border border-gray-300 rounded-md" readonly value="{{ commande.montant }}">
+    </div>
+
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md">{% if commande.pk %}Update{% else %}Create{% endif %}</button>
+</form>
+
+<!-- Include the JavaScript file -->
+ <script src="{% static 'js/validate_numero.js' %}"></script>
+<script src="{% static 'js/form.js' %}"></script>
+{% endblock %}

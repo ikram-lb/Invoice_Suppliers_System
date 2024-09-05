@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-2">
+  <div class="row mb-4">
+    <div class="col-md-10">
+      <nav aria-label="breadcrumb" class="text-sm mb-4">
+        <ol class="inline-flex list-none p-0">
+          <li class="inline-flex items-center">
+            <a href="{% url 'Products' %}" class="text-primary hover:underline">Produits</a>
+            <span class="mx-2">/</span>
+          </li>
+          <li class="inline-flex items-center text-gray-600">Tous les Produits</li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="col-md-2 text-right">
+      <a href="{% url 'add_produit' %}" class="bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark">Ajouter Produit</a>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-4 offset-md-8">
+      <div class="form-group">
+        <input type="text" id="searchField" class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Rechercher">
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Container -->
+  <div class="app-table">
+    <table class="min-w-full bg-white border border-gray-200">
+      <thead>
+        <tr class="bg-gray-100 border-b">
+          <th class="py-2 px-4 text-left">Nom</th>
+          <th class="py-2 px-4 text-left">Description</th>
+          <th class="py-2 px-4 text-left">Prix</th>
+          <th class="py-2 px-4 text-left">Fournisseur</th>
+          <th class="py-2 px-4 text-left"></th>
+        </tr>
+      </thead>
+      <tbody id="productTable">
+        {% if page_obj %}
+          {% for produit in page_obj %}
+          <tr class="border-b">
+            <td class="py-2 px-4">{{ produit.nom }}</td>
+            <td class="py-2 px-4">{{ produit.description }}</td>
+            <td class="py-2 px-4">{{ produit.prixUnitaire }}</td>
+            <td class="py-2 px-4">{{ produit.fournisseur.nom_societe }}</td>
+            <td class="py-2 px-4 flex space-x-2">
+              <a href="{% url 'edit_produit' produit.id %}" class="text-primary hover:text-blue-700">
+                <!-- SVG Edit Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3a2 2 0 012 2v14a2 2 0 01-2 2H9a2 2 0 01-2-2V5a2 2 0 012-2h6z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3V7a2 2 0 002 2h4M10 17l4-4m0 0l4 4m-4-4v9"></path>
+                </svg>
+              </a>
+              <a href="{% url 'delete_produit' produit.id %}" class="text-red-600 hover:text-red-800">
+                <!-- SVG Delete Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="5" class="text-center py-2">Aucun résultat</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>      
+  </div>
+
+  <!-- No Results Message -->
+  <div class="no-results" style="display: none;">
+    <p class="text-center py-4 text-gray-600">Aucun produit trouvé.</p>
+  </div>
+
+  <div class="mt-4 flex items-center justify-between">
+    <div>
+      Affichage page {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </div>
+    <ul class="inline-flex items-center space-x-1">
+      {% if page_obj.has_previous %}
+        <li>
+          <a class="py-2 px-3 rounded bg-primary text-white hover:bg-primary-dark" href="?page=1">&laquo; 1</a>
+        </li>
+        <li>
+          <a class="py-2 px-3 rounded bg-primary text-white hover:bg-primary-dark" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+        </li>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <li>
+          <a class="py-2 px-3 rounded bg-primary text-white hover:bg-primary-dark" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+        </li>
+        <li>
+          <a class="py-2 px-3 rounded bg-primary text-white hover:bg-primary-dark" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }} &raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+
+<!-- Include JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchField = document.getElementById('searchField');
+  const productTable = document.getElementById('productTable');
+  const noResults = document.querySelector('.no-results');
+  const rows = productTable.querySelectorAll('tr');
+
+  searchField.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    let hasVisibleRows = false;
+
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      let visible = false;
+
+      cells.forEach(cell => {
+        if (cell.textContent.toLowerCase().includes(query)) {
+          visible = true;
+        }
+      });
+
+      if (visible) {
+        row.style.display = '';
+        hasVisibleRows = true;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    noResults.style.display = hasVisibleRows ? 'none' : 'block';
+  });
+});
+</script>
+
+{% endblock %}

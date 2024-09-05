@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="flex justify-between items-center mb-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'polls' %}" class="text-blue-600 hover:underline">SuppliersManagement</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ fournisseur.nom }}</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="px-6 py-4">
+      <h3 class="text-xl font-semibold mb-2">{{ fournisseur.nom }}</h3>
+      <p><strong>Description:</strong> {{ fournisseur.description }}</p>
+      <p><strong>Adresse:</strong> {{ fournisseur.adresse }}</p>
+      <p><strong>Contact:</strong> {{ fournisseur.contact }}</p>
+    </div>
+  </div>
+
+  <div class="bg-white shadow-md rounded-lg mt-4">
+    <div class="px-6 py-4">
+      <h4 class="text-lg font-semibold mb-2">Produits</h4>
+      {% if fournisseur.produits.all %}
+      <table class="min-w-full bg-white shadow-md rounded my-4 overflow-hidden">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th class="py-2 px-4">Nom</th>
+            <th class="py-2 px-4">Description</th>
+            <th class="py-2 px-4">Prix</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for produit in fournisseur.produits.all %}
+          <tr class="hover:bg-gray-100">
+            <td class="py-2 px-4">{{ produit.nom }}</td>
+            <td class="py-2 px-4">{{ produit.description }}</td>
+            <td class="py-2 px-4">{{ produit.prix }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No products available for this supplier.</p>
+      {% endif %}
+      <a href="{% url 'add_produit_fournisseurs' fournisseur.id %}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out mt-3">Add Product</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

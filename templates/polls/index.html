@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-2 ml-2">
+  <div class="flex justify-between items-center mb-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'polls' %}" class="text-blue-600 hover:underline">Suppliers Management</a></li>
+        <li class="breadcrumb-item active" aria-current="page">My Suppliers</li>
+      </ol>
+    </nav>
+    <a href="{% url 'add_fournisseur' %}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">Add Supplier</a>
+  </div>
+
+  <!-- Search Input -->
+  <div class="mb-4">
+    <input type="text" id="searchField" placeholder="Search suppliers..." class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </div>
+
+  <!-- Table Container -->
+  <div class="app-table">
+    <table class="min-w-full bg-white shadow-md rounded my-4 overflow-hidden">
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="py-2 px-4">Company Name</th>
+          <th class="py-2 px-4">Contact Person</th>
+          <th class="py-2 px-4">Billing Address</th>
+          <th class="py-2 px-4">City</th>
+          <th class="py-2 px-4">Country/Region</th>
+          <th class="py-2 px-4">Phone Numbers</th>
+          <th class="py-2 px-4">Emails</th>
+          <th class="py-2 px-4">Description</th>
+          <th class="py-2 px-4"></th>
+        </tr>
+      </thead>
+      <tbody id="supplierTable" class="table-body">
+        {% if fournisseurs %}
+          {% for fournisseur in fournisseurs %}
+          <tr class="hover:bg-gray-100">
+            <td class="py-2 px-4"><a href="{% url 'fournisseur_detail' fournisseur.id %}" class="text-blue-600 hover:underline">{{ fournisseur.nom_societe }}</a></td>
+            <td class="py-2 px-4">{{ fournisseur.nom_personne }}</td>
+            <td class="py-2 px-4">{{ fournisseur.adresse_facturation }}</td>
+            <td class="py-2 px-4">{{ fournisseur.ville }}</td>
+            <td class="py-2 px-4">{{ fournisseur.pays_region }}</td>
+            <td class="py-2 px-4">{{ fournisseur.numeros_telephone }}</td>
+            <td class="py-2 px-4">{{ fournisseur.emails }}</td>
+            <td class="py-2 px-4">{{ fournisseur.notes }}</td>
+            <td class="py-2 px-4 flex">
+              <a href="{% url 'edit_fournisseur' fournisseur.id %}" class="text-gray-600 hover:text-gray-900 mr-2">
+                <!-- Edit Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3a2 2 0 012 2v14a2 2 0 01-2 2H9a2 2 0 01-2-2V5a2 2 0 012-2h6z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3V7a2 2 0 002 2h4M10 17l4-4m0 0l4 4m-4-4v9"></path>
+                </svg>
+              </a>
+              <a href="{% url 'delete_fournisseur' fournisseur.id %}" class="text-red-600 hover:text-red-900 ml-2">
+                <!-- Delete Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="9" class="py-2 px-4 text-center">No suppliers found</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- No Results Message -->
+  <div class="no-results" style="display: none;">
+    <p class="text-center py-4 text-gray-600">No results found.</p>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchField = document.getElementById("searchField");
+    const supplierTable = document.getElementById("supplierTable");
+    const noResults = document.querySelector(".no-results");
+    const rows = supplierTable.querySelectorAll("tr");
+
+    searchField.addEventListener("input", () => {
+      const query = searchField.value.toLowerCase();
+      let hasVisibleRows = false;
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        let visible = false;
+
+        cells.forEach(cell => {
+          if (cell.textContent.toLowerCase().includes(query)) {
+            visible = true;
+          }
+        });
+
+        if (visible) {
+          row.style.display = "";
+          hasVisibleRows = true;
+        } else {
+          row.style.display = "none";
+        }
+      });
+
+      noResults.style.display = hasVisibleRows ? "none" : "block";
+    });
+  });
+</script>
+
+{% endblock %}

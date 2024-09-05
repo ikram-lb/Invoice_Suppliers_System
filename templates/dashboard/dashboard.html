@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg-gray-900 p-6 min-h-screen">
+    <h1 class="text-white text-3xl font-bold mb-6">Dashboard</h1>
+    
+    <!-- Dashboard Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Fournisseurs -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center">
+            <div class="bg-white p-4 rounded-full">
+                <i class="fas fa-building text-gray-800 text-4xl"></i>
+            </div>
+            <div class="ml-4 text-white">
+                <p class="text-2xl font-semibold">{{ total_fournisseurs }}</p>
+                <p class="text-sm uppercase">Total Fournisseurs</p>
+            </div>
+        </div>
+        
+        <!-- Total Commandes -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center">
+            <div class="bg-white p-4 rounded-full">
+                <i class="fas fa-clipboard-list text-gray-800 text-4xl"></i>
+            </div>
+            <div class="ml-4 text-white">
+                <p class="text-2xl font-semibold">{{ total_commandes }}</p>
+                <p class="text-sm uppercase">Total Commandes</p>
+            </div>
+        </div>
+
+        <!-- Total Factures -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center">
+            <div class="bg-white p-4 rounded-full">
+                <i class="fas fa-file-invoice text-gray-800 text-4xl"></i>
+            </div>
+            <div class="ml-4 text-white">
+                <p class="text-2xl font-semibold">{{ total_factures }}</p>
+                <p class="text-sm uppercase">Total Factures</p>
+            </div>
+        </div>
+
+        <!-- Total Invoices -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center">
+            <div class="bg-white p-4 rounded-full">
+                <i class="fas fa-file-alt text-gray-800 text-4xl"></i>
+            </div>
+            <div class="ml-4 text-white">
+                <p class="text-2xl font-semibold">{{ total_invoices }}</p>
+                <p class="text-sm uppercase">Total Invoices</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Circular Charts -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-8">
+        <!-- Paid vs Unpaid Invoices -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-white text-xl font-semibold mb-4">Invoices Status</h2>
+            <canvas id="invoicesStatusChart"></canvas>
+        </div>
+
+        <!-- Facture vs Non-Facture -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-white text-xl font-semibold mb-4">Axians Invoice Status</h2>
+            <canvas id="factureStatusChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Plot/Chart -->
+    <div class="bg-gray-800 p-6 mt-8 rounded-lg shadow-lg">
+        <canvas id="documentChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script> <!-- Font Awesome CDN -->
+<script>
+    var ctx1 = document.getElementById('documentChart').getContext('2d');
+    var documentChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Factures', 'Invoices', 'Fournisseurs', 'Commandes'],
+            datasets: [{
+                label: 'Counts',
+                data: [{{ total_factures }}, {{ total_invoices }}, {{ total_fournisseurs }}, {{ total_commandes }}],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 1)',  // Solid Red
+                    'rgba(54, 162, 235, 1)',  // Solid Blue
+                    'rgba(255, 206, 86, 1)',  // Solid Yellow
+                    'rgba(75, 192, 192, 1)'   // Solid Teal
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 0,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    var ctx2 = document.getElementById('invoicesStatusChart').getContext('2d');
+    var invoicesStatusChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Paid', 'Unpaid'],
+            datasets: [{
+                label: 'Invoice Status',
+                data: [{{ paid_invoices }}, {{ unpaid_invoices }}],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 1)',  // Solid Teal
+                    'rgba(255, 99, 132, 1)'   // Solid Red
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    var ctx3 = document.getElementById('factureStatusChart').getContext('2d');
+    var factureStatusChart = new Chart(ctx3, {
+        type: 'doughnut',
+        data: {
+            labels: ['Paid', 'Unpaid'],
+            datasets: [{
+                label: 'Axians invoice status',
+                data: [{{ paid_invoices_Axians }}, {{ unpaid_invoices_Axians }}],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 1)',  // Solid Blue
+                    'rgba(255, 206, 86, 1)'   // Solid Yellow
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+{% endblock %}

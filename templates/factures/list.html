@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2 class="text-3xl font-bold mb-6 text-gray-800">Axians Invoice</h2>
+
+<div class="bg-gray-50 p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between items-center mb-4">
+        <!-- Add Facture Button -->
+        <a href="{% url 'create_facture' %}" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+            Add Invoice
+        </a>
+        <!-- Search Form -->
+        <div class="relative">
+            <input type="text" id="searchField" placeholder="Search Invoice..." 
+                class="form-input w-full border border-gray-300 rounded-l-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+    </div>
+</div>
+
+<div class="overflow-x-auto bg-gray-50 p-4 rounded-lg shadow-lg">
+    <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg">
+        <thead class="bg-blue-600 text-white">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Numero</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Montant</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Fournisseur</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Fichier</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">State</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Change State</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Delete</th>
+            </tr>
+        </thead>
+        <tbody id="factureTable" class="bg-white divide-y divide-gray-200">
+            {% for facture in factures %}
+            <tr class="hover:bg-gray-100 transition-colors duration-200">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ facture.numero }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ facture.date }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ facture.montant }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ facture.fournisseur.nom_societe }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {% if facture.fichier %}
+                        <a href="{{ facture.fichier.url }}" target="_blank" class="text-green-500 hover:text-green-700">View PDF</a>
+                    {% else %}
+                        No file uploaded
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ facture.get_state_display }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <form method="post" action="{% url 'update_facture_state' facture.pk %}" class="flex items-center space-x-2">
+                        {% csrf_token %}
+                        <select name="state" class="form-select h-12 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            {% for key, value in facture.STATUT_CHOICES %}
+                                <option value="{{ key }}" {% if key == facture.state %}selected{% endif %}>{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Update</button>
+                    </form>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <a href="{% url 'view_facture' facture.pk %}" class="text-blue-500 hover:text-blue-700 transition-colors duration-150">View</a>
+                    {% if facture.fichier %}
+                        <a href="{{ facture.fichier.url }}" download class="text-green-500 hover:text-green-700 ml-4 transition-colors duration-150">Download</a>
+                    {% else %}
+                        <span class="text-gray-500 ml-4">No file</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <form method="post" action="{% url 'delete_facture' facture.pk %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="px-6 py-4 text-center text-gray-500">No Invoice found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchField = document.getElementById('searchField');
+        const factureTable = document.getElementById('factureTable');
+        const rows = factureTable.querySelectorAll('tr');
+
+        searchField.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            let hasVisibleRows = false;
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let visible = false;
+
+                cells.forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(query)) {
+                        visible = true;
+                    }
+                });
+
+                if (visible) {
+                    row.style.display = '';
+                    hasVisibleRows = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Optionally show or hide a "No results" message here
+            // Example: document.querySelector('.no-results').style.display = hasVisibleRows ? 'none' : 'block';
+        });
+    });
+</script>
+
+{% endblock %}
